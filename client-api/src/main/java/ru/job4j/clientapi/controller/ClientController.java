@@ -2,12 +2,15 @@ package ru.job4j.clientapi.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.job4j.clientapi.dto.PassportDto;
 
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,21 +23,39 @@ public class ClientController {
     private String passportUrl;
 
     @GetMapping("/find")
-    public List getAll(@RequestParam(value = "series", required = false) String series) {
+    public List<PassportDto> getAll(@RequestParam(value = "series", required = false) String series) {
         String uri = UriComponentsBuilder.fromUriString(passportUrl + "/find")
                 .queryParam("series", series)
                 .toUriString();
-        return restTemplate.getForObject(uri, List.class);
+        List<PassportDto> body = restTemplate.exchange(
+                uri,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<PassportDto>>() { }
+        ).getBody();
+        return body != null ? body : Collections.emptyList();
     }
 
     @GetMapping("/find/unavailable")
-    public List getAllUnavailable() {
-        return restTemplate.getForObject(passportUrl + "/find/unavailable", List.class);
+    public List<PassportDto> getAllUnavailable() {
+        List<PassportDto> body = restTemplate.exchange(
+                passportUrl + "/find/unavailable",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<PassportDto>>() { }
+        ).getBody();
+        return body != null ? body : Collections.emptyList();
     }
 
     @GetMapping("/find/replaceable")
-    public List getAllToBeReplaced() {
-        return restTemplate.getForObject(passportUrl + "/find/replaceable", List.class);
+    public List<PassportDto> getAllToBeReplaced() {
+        List<PassportDto> body = restTemplate.exchange(
+                passportUrl + "/find/replaceable",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<PassportDto>>() { }
+        ).getBody();
+        return body != null ? body : Collections.emptyList();
     }
 
     @PostMapping("/save")
